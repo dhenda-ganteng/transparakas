@@ -1,67 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TransparaKas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Kas Transparan, Organisasi Tepercaya.** Aplikasi web manajemen kas dan audit trail untuk organisasi mahasiswa (HIMA, BEM, UKM).
 
-## About Laravel
+- **URL Aplikasi:** `https://GANTI-DENGAN-URL-DEPLOY-ANDA` _(isi setelah deploy)_
+- **Repository:** https://github.com/dhenda-ganteng/transparakas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Deskripsi Aplikasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+TransparaKas membantu organisasi mahasiswa mencatat pemasukan, pengeluaran, iuran anggota, dan anggaran kegiatan secara rapi dan transparan. Setiap perubahan transaksi terekam di **Audit Log** (siapa, kapan, nilai lama vs nilai baru). Data tiap organisasi terpisah (multi-tenant) dan satu akun hanya terhubung ke satu organisasi.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Fitur
 
-## Learning Laravel
+- **Autentikasi:** daftar, login (dibatasi 5 percobaan gagal per menit), profil dan ubah password.
+- **Multi-organisasi (tenant):** setiap organisasi memiliki data keuangan sendiri yang terisolasi.
+- **Peran (RBAC):** Super Admin Platform, Admin Organisasi, Bendahara, Auditor/Ketua, Anggota.
+- **Transaksi keuangan:** pemasukan dan pengeluaran per kategori, pembatalan transaksi dengan alasan wajib.
+- **Iuran anggota:** pembayaran, verifikasi bendahara, dan status iuran.
+- **Anggaran kegiatan:** rencana anggaran dan realisasi per kegiatan.
+- **Laporan keuangan:** ringkasan kas dan grafik.
+- **Audit Log:** jejak perubahan data yang tidak dapat dimanipulasi dari antarmuka.
+- **Manajemen organisasi:** kode undangan, persetujuan permintaan gabung, pengaturan peran dan status anggota, kebijakan keterlihatan transaksi.
+- **Pengajuan penonaktifan organisasi:** Admin Organisasi mengajukan, Super Admin menyetujui atau menolak.
+- **Super Admin Platform:** mengelola daftar organisasi tanpa akses ke data keuangan (aturan T-04).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Teknologi
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.2+ dan Laravel 12
+- MySQL (dipakai saat pengembangan; query urutan peran memakai fungsi `FIELD()` milik MySQL/MariaDB)
+- Blade, Tailwind CSS v4, Vite 7
+- Chart.js untuk grafik laporan
 
-## Laravel Sponsors
+## Instalasi dan Menjalankan Secara Lokal
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Prasyarat: PHP 8.2+, Composer, Node.js, dan MySQL (mis. XAMPP).
 
-### Premium Partners
+```bash
+git clone https://github.com/dhenda-ganteng/transparakas.git
+cd transparakas
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+composer install
+npm install
 
-## Contributing
+cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Buat database kosong di MySQL, misalnya `transparakas`.
+2. Isi konfigurasi database di `.env` (lihat bagian berikut).
+3. Jalankan migrasi dan build aset:
 
-## Code of Conduct
+```bash
+php artisan migrate
+npm run build
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Buka `http://127.0.0.1:8000`.
 
-## Security Vulnerabilities
+Buat akun Super Admin (tidak ada akun demo):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan make:superadmin
+```
 
-## License
+Password wajib minimal 12 karakter dengan huruf besar, huruf kecil, angka, dan simbol. Organisasi dan admin organisasi dibuat lewat halaman **Daftar**.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Konfigurasi Environment Variable
 
-## Keamanan & Deploy (TransparaKas)
+Salin `.env.example` menjadi `.env`, lalu isi nilainya sendiri. **Jangan commit `.env`** (sudah masuk `.gitignore`). Nilai rahasia tidak ditulis di repository.
 
-- Jangan commit file `.env`. Salin dari `.env.example` dan isi nilainya sendiri.
-- Tidak ada akun demo. Buat Super Admin dengan `php artisan make:superadmin` (atau isi `SUPERADMIN_PASSWORD` kuat di `.env` lalu `php artisan db:seed`).
-- Produksi: set `APP_ENV=production` dan `APP_DEBUG=false`, jalankan `php artisan key:generate` dan `php artisan migrate --force`. Seeder demo otomatis diblokir di produksi.
-- Buat Super Admin produksi dengan `php artisan make:superadmin` (password min. 12 karakter, kombinasi huruf besar, kecil, angka, simbol).
+| Variable | Keterangan |
+| --- | --- |
+| `APP_NAME`, `APP_URL` | Nama dan URL aplikasi |
+| `APP_ENV` | `local` untuk pengembangan, `production` untuk server |
+| `APP_DEBUG` | `true` hanya di lokal, wajib `false` di produksi |
+| `APP_KEY` | Dibuat dengan `php artisan key:generate` |
+| `DB_CONNECTION` | `mysql` |
+| `DB_HOST`, `DB_PORT`, `DB_DATABASE` | Lokasi dan nama database |
+| `DB_USERNAME`, `DB_PASSWORD` | Kredensial database (isi sendiri) |
+| `SESSION_DRIVER`, `CACHE_STORE` | `file` atau `database` |
+| `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD` | Opsional, untuk `php artisan db:seed` (password kuat, min. 12 karakter) |
 
+Deploy produksi:
+
+```bash
+php artisan key:generate
+php artisan migrate --force
+php artisan make:superadmin
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+```
+
+Seeder otomatis menolak berjalan saat `APP_ENV=production`, dan seeder tidak membuat akun atau data demo.
+
+## Ringkasan Penggunaan AI Agent
+
+Proyek ini dikerjakan dengan bantuan **Antigravity (AI agent Google DeepMind)** dalam pola pair programming:
+
+- Menyusun struktur aplikasi Laravel multi-tenant, RBAC, audit trail, dan 23 layar sesuai PRD (`docs/PRD.md`).
+- Membuat migrasi, model, controller, view, tampilan (logo, login, navigasi), dan fitur pengajuan penonaktifan organisasi.
+- Melakukan audit sebelum upload: memindai secret, memeriksa `.gitignore`, riwayat git, dan isi staging; menghapus akun/data demo; memindahkan password ke `.env`; membuat command `make:superadmin`.
+- Semua keputusan, konfigurasi, dan hasil akhir ditinjau oleh pengembang. Kode hasil AI diperiksa dengan sintaks lint dan kompilasi view sebelum dipakai.
+
+## Hasil Self-Testing Keamanan
+
+Pemeriksaan yang sudah dilakukan:
+
+| Aspek | Hasil |
+| --- | --- |
+| Secret di repository | Tidak ditemukan (pemindaian `Password123`, `APP_KEY`, `DB_PASSWORD`, token GitHub/AWS, private key) pada file ter-track dan riwayat git |
+| `.env`, log, `vendor`, `node_modules`, database sqlite | Diabaikan git (`git check-ignore`) |
+| Akun/password demo | Dihapus dari database, kode, dan dokumen; seeder tidak memuat akun demo |
+| Password | Disimpan dengan hash (bcrypt); password Super Admin acak dan kuat, berasal dari `.env` |
+| Brute force login | Dibatasi 5 percobaan gagal per menit (per email dan IP) |
+| Otorisasi | Rute dilindungi middleware peran (`member:super_admin`, `member:admin_organisasi`, dan lainnya) |
+| Isolasi data tenant | Global scope `BelongsToOrganization` pada model keuangan |
+| Super Admin | Tidak memiliki akses ke data keuangan organisasi (T-04) |
+| CSRF dan XSS | Semua form memakai `@csrf`; keluaran Blade di-escape `{{ }}` |
+| Kualitas kode | Seluruh file PHP lolos `php -l`; semua view Blade berhasil di-compile |
+
+Catatan: pengujian di atas bersifat pemeriksaan statis dan manual. Uji penetrasi dinamis (misalnya scanner otomatis di URL deploy) belum dijalankan. Tambahkan hasilnya di sini setelah dilakukan.
