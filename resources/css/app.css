@@ -1,0 +1,104 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Mempertegas outline, border, divider, input, tabel, dan keterbacaan di seluruh tampilan */
+@layer base {
+    input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    select,
+    textarea {
+        border-width: 1.5px;
+        border-color: #64748b;
+        color: #0f172a;
+    }
+
+    input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
+    select:focus,
+    textarea:focus {
+        border-color: #0f766e;
+        outline: 2.5px solid rgba(15, 118, 110, 0.28);
+        outline-offset: 1px;
+    }
+
+    input[type='checkbox'],
+    input[type='radio'] {
+        accent-color: #0f766e;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+        outline: 2px solid #0f766e;
+        outline-offset: 2px;
+    }
+
+    table thead {
+        border-bottom: 1.5px solid #94a3b8;
+    }
+
+    table thead th {
+        color: #334155;
+        font-weight: 700;
+    }
+}
+
+/* Pertegas warna border & divider netral agar setiap kartu, tabel, dan tombol terlihat jelas */
+.border-slate-100 {
+    border-color: #cbd5e1 !important;
+}
+
+.border-slate-200 {
+    border-color: #94a3b8 !important;
+}
+
+.border-slate-300 {
+    border-color: #64748b !important;
+}
+
+.divide-slate-100 > :not(:last-child),
+.divide-slate-200 > :not(:last-child) {
+    border-color: #cbd5e1 !important;
+}
+
+.border-red-200 {
+    border-color: #fca5a5 !important;
+}
+
+.border-emerald-200 {
+    border-color: #6ee7b7 !important;
+}
+
+.border-amber-200 {
+    border-color: #fcd34d !important;
+}
+
+.border-teal-200 {
+    border-color: #5eead4 !important;
+}
+
+.border-blue-200 {
+    border-color: #93c5fd !important;
+}
+
+.bg-white.border,
+.bg-slate-50.border,
+button.border,
+a.border {
+    border-width: 1.5px;
+}
+
+/* Perjelas teks sekunder agar kontras lebih tajam */
+.text-slate-400 {
+    color: #64748b !important;
+}
+
+.text-slate-500 {
+    color: #475569 !important;
+}
