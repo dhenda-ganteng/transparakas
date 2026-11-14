@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard') — TransparaKas</title>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -272,8 +277,32 @@
                     </div>
                     <span class="max-w-[130px] truncate">{{ $user?->name }}</span>
                 </a>
+
+                <!-- Tombol Mode Gelap / Terang -->
+                <button type="button" id="theme-toggle" onclick="toggleTheme()" title="Ganti Mode Gelap / Terang"
+                    class="p-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 transition cursor-pointer" aria-label="Ganti tema">
+                    <svg id="theme-icon-moon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                    <svg id="theme-icon-sun" class="w-4 h-4 hidden text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </button>
             </div>
         </header>
+        <script>
+            function syncThemeIcons() {
+                const isDark = document.documentElement.classList.contains('dark');
+                document.getElementById('theme-icon-moon')?.classList.toggle('hidden', isDark);
+                document.getElementById('theme-icon-sun')?.classList.toggle('hidden', !isDark);
+            }
+            function toggleTheme() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                syncThemeIcons();
+            }
+            syncThemeIcons();
+        </script>
 
         <!-- Area Isi Halaman -->
         <main class="flex-1 p-4 lg:p-8 max-w-[1280px] w-full mx-auto space-y-6">
