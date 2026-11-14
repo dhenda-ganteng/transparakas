@@ -1,87 +1,121 @@
 # TransparaKas
 
-**Kas Transparan, Organisasi Tepercaya.** Aplikasi web manajemen kas dan audit trail untuk organisasi mahasiswa (HIMA, BEM, UKM).
+> **Kas Transparan, Organisasi Tepercaya.**  
+> Aplikasi manajemen kas dan audit trail multi-tenant untuk organisasi mahasiswa (HIMA, BEM, UKM).
 
-- **URL Aplikasi:** `https://GANTI-DENGAN-URL-DEPLOY-ANDA` _(isi setelah deploy)_
-- **Repository:** https://github.com/dhenda-ganteng/transparakas
+| Informasi | Keterangan |
+| :--- | :--- |
+| **URL Aplikasi** | `https://GANTI-DENGAN-URL-DEPLOY-ANDA` _(perbarui setelah deploy)_ |
+| **Repository** | [github.com/dhenda-ganteng/transparakas](https://github.com/dhenda-ganteng/transparakas) |
+| **Framework** | Laravel 12 · PHP 8.2+ · Tailwind CSS v4 · MySQL |
 
-## Deskripsi Aplikasi
+---
 
-TransparaKas membantu organisasi mahasiswa mencatat pemasukan, pengeluaran, iuran anggota, dan anggaran kegiatan secara rapi dan transparan. Setiap perubahan transaksi terekam di **Audit Log** (siapa, kapan, nilai lama vs nilai baru). Data tiap organisasi terpisah (multi-tenant) dan satu akun hanya terhubung ke satu organisasi.
+## 1. Deskripsi Aplikasi
 
-## Fitur
+**TransparaKas** adalah aplikasi web keuangan organisasi mahasiswa yang dirancang untuk menjaga akuntabilitas pencatatan pemasukan, pengeluaran, iuran anggota, dan anggaran kegiatan.
 
-- **Autentikasi:** daftar, login (dibatasi 5 percobaan gagal per menit), profil dan ubah password.
-- **Multi-organisasi (tenant):** setiap organisasi memiliki data keuangan sendiri yang terisolasi.
-- **Peran (RBAC):** Super Admin Platform, Admin Organisasi, Bendahara, Auditor/Ketua, Anggota.
-- **Transaksi keuangan:** pemasukan dan pengeluaran per kategori, pembatalan transaksi dengan alasan wajib.
-- **Iuran anggota:** pembayaran, verifikasi bendahara, dan status iuran.
-- **Anggaran kegiatan:** rencana anggaran dan realisasi per kegiatan.
-- **Laporan keuangan:** ringkasan kas dan grafik.
-- **Audit Log:** jejak perubahan data yang tidak dapat dimanipulasi dari antarmuka.
-- **Manajemen organisasi:** kode undangan, persetujuan permintaan gabung, pengaturan peran dan status anggota, kebijakan keterlihatan transaksi.
-- **Pengajuan penonaktifan organisasi:** Admin Organisasi mengajukan, Super Admin menyetujui atau menolak.
-- **Super Admin Platform:** mengelola daftar organisasi tanpa akses ke data keuangan (aturan T-04).
+Setiap perubahan transaksi tercatat otomatis dalam **Audit Log** (pelaku, waktu, serta nilai sebelum dan sesudah perubahan) yang tidak dapat diubah dari antarmuka. Sistem menggunakan arsitektur **multi-tenant** sehingga data keuangan tiap organisasi terisolasi penuh dan satu akun hanya terhubung ke satu organisasi.
 
-## Teknologi
+---
 
-- PHP 8.2+ dan Laravel 12
-- MySQL (dipakai saat pengembangan; query urutan peran memakai fungsi `FIELD()` milik MySQL/MariaDB)
-- Blade, Tailwind CSS v4, Vite 7
-- Chart.js untuk grafik laporan
+## 2. Fitur Utama
 
-## Instalasi dan Menjalankan Secara Lokal
+### Manajemen Keuangan & Pelaporan
+- **Transaksi Keuangan:** Pencatatan pemasukan dan pengeluaran per kategori, lengkap dengan pembatalan transaksi disertai alasan wajib.
+- **Iuran Anggota:** Pengajuan pembayaran iuran oleh anggota, verifikasi oleh Bendahara, serta pemantauan status lunas/tertunggak.
+- **Anggaran Kegiatan:** Perencanaan anggaran dan pemantauan realisasi per acara/kegiatan.
+- **Laporan Keuangan:** Ringkasan arus kas bulanan dan visualisasi grafik menggunakan Chart.js.
 
-Prasyarat: PHP 8.2+, Composer, Node.js, dan MySQL (mis. XAMPP).
+### Keamanan, Tata Kelola & Multi-Tenant
+- **Isolasi Data Organisasi:** Setiap organisasi memiliki ruang data terpisah melalui global scope model.
+- **Kontrol Akses Berbasis Peran (RBAC):**
+  - `Super Admin Platform`: Mengelola status aktif/nonaktif organisasi tanpa akses ke data keuangan (Aturan T-04).
+  - `Admin Organisasi`: Mengelola anggota, kode undangan, persetujuan gabung, kebijakan keterlihatan transaksi, dan pengajuan penonaktifan organisasi.
+  - `Bendahara`: Mengelola transaksi, kategori, verifikasi iuran, anggaran, dan laporan.
+  - `Auditor / Ketua`: Memantau seluruh transaksi, laporan, dan Audit Log (*read-only*).
+  - `Anggota`: Melihat ringkasan kas sesuai kebijakan organisasi dan membayar iuran pribadi.
+- **Audit Trail:** Pencatatan otomatis setiap aktivitas penting dan perubahan nilai data.
+- **Autentikasi Terproteksi:** Registrasi dengan kode undangan/buat organisasi, pembatasan login (maks. 5 percobaan gagal per menit), serta pengelolaan profil & ubah password.
 
-```bash
-git clone https://github.com/dhenda-ganteng/transparakas.git
-cd transparakas
+---
 
-composer install
-npm install
+## 3. Teknologi yang Digunakan
 
-cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
-php artisan key:generate
-```
+| Lapisan | Teknologi |
+| :--- | :--- |
+| **Backend** | PHP 8.2+, Laravel 12 |
+| **Database** | MySQL / MariaDB |
+| **Frontend** | Blade Template, Tailwind CSS v4, Vite 7 |
+| **Visualisasi** | Chart.js |
 
-1. Buat database kosong di MySQL, misalnya `transparakas`.
-2. Isi konfigurasi database di `.env` (lihat bagian berikut).
-3. Jalankan migrasi dan build aset:
+---
 
-```bash
-php artisan migrate
-npm run build
-php artisan serve
-```
+## 4. Instalasi & Menjalankan Secara Lokal
 
-Buka `http://127.0.0.1:8000`.
+### Prasyarat
+- PHP 8.2 atau lebih baru
+- Composer
+- Node.js & npm
+- MySQL / MariaDB (misalnya melalui XAMPP)
 
-Buat akun Super Admin (tidak ada akun demo):
+### Langkah Instalasi
 
-```bash
-php artisan make:superadmin
-```
+1. **Clone repository dan masuk ke direktori proyek:**
+   ```bash
+   git clone https://github.com/dhenda-ganteng/transparakas.git
+   cd transparakas
+   ```
 
-Password wajib minimal 12 karakter dengan huruf besar, huruf kecil, angka, dan simbol. Organisasi dan admin organisasi dibuat lewat halaman **Daftar**.
+2. **Pasang dependensi PHP dan JavaScript:**
+   ```bash
+   composer install
+   npm install
+   ```
 
-## Konfigurasi Environment Variable
+3. **Salin konfigurasi environment dan buat application key:**
+   ```bash
+   cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
+   php artisan key:generate
+   ```
 
-Salin `.env.example` menjadi `.env`, lalu isi nilainya sendiri. **Jangan commit `.env`** (sudah masuk `.gitignore`). Nilai rahasia tidak ditulis di repository.
+4. **Siapkan database:**
+   - Buat database kosong di MySQL, misalnya `transparakas`.
+   - Sesuaikan pengaturan `DB_*` di file `.env`.
 
-| Variable | Keterangan |
-| --- | --- |
-| `APP_NAME`, `APP_URL` | Nama dan URL aplikasi |
-| `APP_ENV` | `local` untuk pengembangan, `production` untuk server |
-| `APP_DEBUG` | `true` hanya di lokal, wajib `false` di produksi |
-| `APP_KEY` | Dibuat dengan `php artisan key:generate` |
-| `DB_CONNECTION` | `mysql` |
-| `DB_HOST`, `DB_PORT`, `DB_DATABASE` | Lokasi dan nama database |
-| `DB_USERNAME`, `DB_PASSWORD` | Kredensial database (isi sendiri) |
-| `SESSION_DRIVER`, `CACHE_STORE` | `file` atau `database` |
-| `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD` | Opsional, untuk `php artisan db:seed` (password kuat, min. 12 karakter) |
+5. **Jalankan migrasi, build aset, dan nyalakan server lokal:**
+   ```bash
+   php artisan migrate
+   npm run build
+   php artisan serve
+   ```
+   Akses aplikasi melalui `http://127.0.0.1:8000`.
 
-Deploy produksi:
+6. **Buat akun Super Admin Platform:**
+   ```bash
+   php artisan make:superadmin
+   ```
+   > Password wajib minimal 12 karakter dengan kombinasi huruf besar, huruf kecil, angka, dan simbol. Untuk akun organisasi dan pengurus, daftarkan melalui halaman **Daftar** di aplikasi.
+
+---
+
+## 5. Konfigurasi Environment Variable
+
+Salin `.env.example` menjadi `.env` dan isi nilainya secara lokal/server. **Jangan pernah melakukan commit terhadap file `.env`** (sudah tercantum di `.gitignore`).
+
+| Variabel | Fungsi | Catatan Keamanan |
+| :--- | :--- | :--- |
+| `APP_NAME`, `APP_URL` | Nama dan URL utama aplikasi | Sesuaikan dengan domain deploy |
+| `APP_ENV` | Mode lingkungan (`local` / `production`) | Wajib `production` saat live |
+| `APP_DEBUG` | Menampilkan detail error | Wajib `false` saat live |
+| `APP_KEY` | Kunci enkripsi aplikasi Laravel | Hasilkan dengan `php artisan key:generate` |
+| `DB_CONNECTION` | Driver database (`mysql`) | — |
+| `DB_HOST`, `DB_PORT`, `DB_DATABASE` | Alamat, port, dan nama database | — |
+| `DB_USERNAME`, `DB_PASSWORD` | Kredensial database | Jangan tulis di repository |
+| `SESSION_DRIVER`, `CACHE_STORE` | Penyimpanan sesi dan cache (`file` / `database`) | — |
+| `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD` | Opsional untuk `db:seed` | Gunakan password kuat min. 12 karakter |
+
+### Perintah Ringkas Deploy Produksi
 
 ```bash
 php artisan key:generate
@@ -90,32 +124,33 @@ php artisan make:superadmin
 php artisan config:cache && php artisan route:cache && php artisan view:cache
 ```
 
-Seeder otomatis menolak berjalan saat `APP_ENV=production`, dan seeder tidak membuat akun atau data demo.
+> `DatabaseSeeder` secara otomatis menolak berjalan saat `APP_ENV=production` dan tidak memuat akun maupun data demo.
 
-## Ringkasan Penggunaan AI Agent
+---
 
-Proyek ini dikerjakan dengan bantuan **Antigravity (AI agent Google DeepMind)** dalam pola pair programming:
+## 6. Ringkasan Penggunaan AI Agent
 
-- Menyusun struktur aplikasi Laravel multi-tenant, RBAC, audit trail, dan 23 layar sesuai PRD (`docs/PRD.md`).
-- Membuat migrasi, model, controller, view, tampilan (logo, login, navigasi), dan fitur pengajuan penonaktifan organisasi.
-- Melakukan audit sebelum upload: memindai secret, memeriksa `.gitignore`, riwayat git, dan isi staging; menghapus akun/data demo; memindahkan password ke `.env`; membuat command `make:superadmin`.
-- Semua keputusan, konfigurasi, dan hasil akhir ditinjau oleh pengembang. Kode hasil AI diperiksa dengan sintaks lint dan kompilasi view sebelum dipakai.
+Pengembangan proyek ini dibantu oleh **Antigravity (AI agent Google DeepMind)** dengan pendekatan *pair programming*:
 
-## Hasil Self-Testing Keamanan
+- **Perancangan & Implementasi:** Membantu menyusun arsitektur multi-tenant Laravel 12, skema migrasi, RBAC, mekanisme Audit Log, serta 23 layar antarmuka sesuai dokumen spesifikasi (`docs/PRD.md`).
+- **Penyempurnaan Antarmuka & Fitur:** Pembuatan komponen logo, halaman login/register, navigasi sidebar/topbar, dan alur pengajuan penonaktifan organisasi.
+- **Audit Keamanan Pra-Upload:** Pemindaian secret di kode dan riwayat git, verifikasi `.gitignore`, penghapusan akun/data demo, pemisahan kredensial ke `.env`, serta pembuatan command `make:superadmin`.
+- **Validasi Pengembang:** Seluruh struktur, konfigurasi, dan hasil keluaran AI ditinjau ulang serta diperiksa menggunakan `php -l` dan `php artisan view:cache`.
 
-Pemeriksaan yang sudah dilakukan:
+---
 
-| Aspek | Hasil |
-| --- | --- |
-| Secret di repository | Tidak ditemukan (pemindaian `Password123`, `APP_KEY`, `DB_PASSWORD`, token GitHub/AWS, private key) pada file ter-track dan riwayat git |
-| `.env`, log, `vendor`, `node_modules`, database sqlite | Diabaikan git (`git check-ignore`) |
-| Akun/password demo | Dihapus dari database, kode, dan dokumen; seeder tidak memuat akun demo |
-| Password | Disimpan dengan hash (bcrypt); password Super Admin acak dan kuat, berasal dari `.env` |
-| Brute force login | Dibatasi 5 percobaan gagal per menit (per email dan IP) |
-| Otorisasi | Rute dilindungi middleware peran (`member:super_admin`, `member:admin_organisasi`, dan lainnya) |
-| Isolasi data tenant | Global scope `BelongsToOrganization` pada model keuangan |
-| Super Admin | Tidak memiliki akses ke data keuangan organisasi (T-04) |
-| CSRF dan XSS | Semua form memakai `@csrf`; keluaran Blade di-escape `{{ }}` |
-| Kualitas kode | Seluruh file PHP lolos `php -l`; semua view Blade berhasil di-compile |
+## 7. Hasil Self-Testing Keamanan
 
-Catatan: pengujian di atas bersifat pemeriksaan statis dan manual. Uji penetrasi dinamis (misalnya scanner otomatis di URL deploy) belum dijalankan. Tambahkan hasilnya di sini setelah dilakukan.
+| Aspek Pemeriksaan | Status | Keterangan |
+| :--- | :---: | :--- |
+| **Pemindaian Secret** | Lulus | Tidak ada password hardcoded, `APP_KEY`, `DB_PASSWORD`, token GitHub/AWS, atau private key di file ter-track maupun riwayat git |
+| **File Terkecuali (`.gitignore`)** | Lulus | `.env`, log, `vendor`, `node_modules`, `public/build`, dan file `.sqlite` terverifikasi diabaikan git |
+| **Akun & Data Demo** | Lulus | Dihapus dari database dan kode; seeder diblokir di lingkungan `production` |
+| **Penyimpanan Password** | Lulus | Seluruh password di-hash dengan bcrypt; `make:superadmin` mewajibkan kompleksitas tinggi |
+| **Proteksi Brute Force** | Lulus | Login dibatasi maksimal 5 percobaan gagal per menit per email dan IP |
+| **Otorisasi & Isolasi Tenant** | Lulus | Rute dilindungi middleware peran dan model keuangan menerapkan global scope `BelongsToOrganization` |
+| **Batasan Super Admin (T-04)** | Lulus | Super Admin hanya mengelola status organisasi tanpa akses data transaksi keuangan |
+| **Proteksi CSRF & XSS** | Lulus | Formulir menggunakan token `@csrf` dan output Blade di-escape otomatis (`{{ }}`) |
+| **Pemeriksaan Sintaks & View** | Lulus | Seluruh file PHP lolos `php -l` dan kompilasi template Blade berhasil tanpa error |
+
+> Catatan: Hasil di atas merupakan pemeriksaan statis dan verifikasi fungsional lokal. Pengujian penetrasi dinamis pada URL produksi dapat ditambahkan setelah aplikasi live.
