@@ -5,7 +5,7 @@
 
 | Informasi | Keterangan |
 | :--- | :--- |
-| **URL Aplikasi** | `https://GANTI-DENGAN-URL-DEPLOY-ANDA` _(perbarui setelah deploy)_ |
+| **URL Aplikasi** | `https://transparakas.my.id` |
 | **Repository** | [github.com/dhenda-ganteng/transparakas](https://github.com/dhenda-ganteng/transparakas) |
 | **Framework** | Laravel 12 · PHP 8.2+ · Tailwind CSS v4 · MySQL |
 
