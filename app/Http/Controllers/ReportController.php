@@ -112,14 +112,14 @@ class ReportController extends Controller
             fputcsv($handle, ['Tanggal', 'Keterangan', 'Kategori', 'Tipe', 'Nominal (Rp)', 'Dicatat Oleh'], ';');
 
             foreach ($transactions as $tx) {
-                fputcsv($handle, [
+                fputcsv($handle, $this->sanitizeCsvRow([
                     $tx->transaction_date->format('Y-m-d'),
                     $tx->description,
                     $tx->category?->name ?? '-',
                     $tx->type === 'income' ? 'Pemasukan' : 'Pengeluaran',
                     (int) $tx->amount,
                     $tx->creator?->name ?? '-',
-                ], ';');
+                ]), ';');
             }
 
             fclose($handle);

@@ -310,7 +310,7 @@ class TransactionController extends Controller
             fputcsv($handle, ['Tanggal', 'Keterangan', 'Kategori', 'Tipe', 'Nominal (Rp)', 'Status', 'Dibuat Oleh'], ';');
 
             foreach ($transactions as $tx) {
-                fputcsv($handle, [
+                fputcsv($handle, $this->sanitizeCsvRow([
                     $tx->transaction_date->format('Y-m-d'),
                     $tx->description,
                     $tx->category?->name ?? '-',
@@ -318,7 +318,7 @@ class TransactionController extends Controller
                     (int) $tx->amount,
                     $tx->status === 'active' ? 'Aktif' : 'Dibatalkan',
                     $tx->creator?->name ?? '-',
-                ], ';');
+                ]), ';');
             }
 
             fclose($handle);
