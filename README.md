@@ -132,25 +132,29 @@ php artisan config:cache && php artisan route:cache && php artisan view:cache
 
 Pengembangan proyek ini dibantu oleh **Antigravity (AI agent Google DeepMind)** dengan pendekatan *pair programming*:
 
-- **Perancangan & Implementasi:** Membantu menyusun arsitektur multi-tenant Laravel 12, skema migrasi, RBAC, mekanisme Audit Log, serta 23 layar antarmuka sesuai dokumen spesifikasi (`docs/PRD.md`).
-- **Penyempurnaan Antarmuka & Fitur:** Pembuatan komponen logo, halaman login/register, navigasi sidebar/topbar, dan alur pengajuan penonaktifan organisasi.
-- **Audit Keamanan Pra-Upload:** Pemindaian secret di kode dan riwayat git, verifikasi `.gitignore`, penghapusan akun/data demo, pemisahan kredensial ke `.env`, serta pembuatan command `make:superadmin`.
-- **Validasi Pengembang:** Seluruh struktur, konfigurasi, dan hasil keluaran AI ditinjau ulang serta diperiksa menggunakan `php -l` dan `php artisan view:cache`.
+- **Alat AI yang Dipakai:** Antigravity (Google DeepMind) di lingkungan editor lokal.
+- **Bagian Pekerjaan yang Dibantu:**
+  - Merancang struktur aplikasi multi-tenant Laravel 12, migrasi database, RBAC 5 peran, Audit Log, serta 23 layar antarmuka sesuai spesifikasi (`docs/PRD.md`).
+  - Menyempurnakan antarmuka (logo bertema uang, halaman login/register, sidebar/topbar, dan mode gelap) serta alur pengajuan penonaktifan organisasi.
+  - Melakukan peninjauan keamanan pra-upload (pemindaian secret, `.gitignore`, riwayat git, `SecurityHeaders` middleware, pemisahan kredensial ke `.env`, dan pembuatan command `make:superadmin`).
+- **Contoh Prompt Utama:**
+  1. *"Bangun aplikasi manajemen kas organisasi mahasiswa multi-tenant (TransparaKas) dengan Laravel 12 sesuai PRD: isolasi data per organisasi, RBAC (Super Admin tanpa akses keuangan, Admin Organisasi, Bendahara, Auditor, Anggota), serta Audit Log yang mencatat nilai lama dan nilai baru setiap perubahan transaksi."*
+  2. *"Tambahkan fitur pengajuan penonaktifan organisasi dari Admin Organisasi ke Super Admin Platform dengan alasan wajib dan pencatatan ke Audit Log, tanpa melanggar aturan isolasi data keuangan."*
+  3. *"Periksa seluruh file proyek dan riwayat Git sebelum diunggah ke GitHub agar tidak ada secret, kredensial, atau akun demo yang bocor, lalu tambahkan Security Headers standar OWASP."*
+- **Cara Peninjauan & Verifikasi:** Seluruh kode hasil AI ditinjau secara manual pada bagian autentikasi, hashing password, otorisasi middleware, global scope tenant, dan query database, lalu diuji menggunakan `php -l`, `php artisan view:cache`, dan audit dependensi.
 
 ---
 
 ## 7. Hasil Self-Testing Keamanan
 
-| Aspek Pemeriksaan | Status | Keterangan |
-| :--- | :---: | :--- |
-| **Pemindaian Secret** | Lulus | Tidak ada password hardcoded, `APP_KEY`, `DB_PASSWORD`, token GitHub/AWS, atau private key di file ter-track maupun riwayat git |
-| **File Terkecuali (`.gitignore`)** | Lulus | `.env`, log, `vendor`, `node_modules`, `public/build`, dan file `.sqlite` terverifikasi diabaikan git |
-| **Akun & Data Demo** | Lulus | Dihapus dari database dan kode; seeder diblokir di lingkungan `production` |
-| **Penyimpanan Password** | Lulus | Seluruh password di-hash dengan bcrypt; `make:superadmin` mewajibkan kompleksitas tinggi |
-| **Proteksi Brute Force** | Lulus | Login dibatasi maksimal 5 percobaan gagal per menit per email dan IP |
-| **Otorisasi & Isolasi Tenant** | Lulus | Rute dilindungi middleware peran dan model keuangan menerapkan global scope `BelongsToOrganization` |
-| **Batasan Super Admin (T-04)** | Lulus | Super Admin hanya mengelola status organisasi tanpa akses data transaksi keuangan |
-| **Proteksi CSRF & XSS** | Lulus | Formulir menggunakan token `@csrf` dan output Blade di-escape otomatis (`{{ }}`) |
-| **Pemeriksaan Sintaks & View** | Lulus | Seluruh file PHP lolos `php -l` dan kompilasi template Blade berhasil tanpa error |
+### Ringkasan Pemeriksaan & Skenario Uji
 
-> Catatan: Hasil di atas merupakan pemeriksaan statis dan verifikasi fungsional lokal. Pengujian penetrasi dinamis pada URL produksi dapat ditambahkan setelah aplikasi live.
+| No | Skenario Uji | Cara Pengujian | Hasil | Perbaikan yang Dilakukan |
+| :---: | :--- | :--- | :---: | :--- |
+| 1 | **SQL Injection & XSS pada form input / URL** | Memasukkan payload `' OR 1=1 --` dan `<script>alert(1)</script>` pada form login, pencarian transaksi, dan input catatan | **Lolos** | Seluruh query menggunakan Eloquent / parameter binding dan output Blade di-escape otomatis (`{{ }}`) |
+| 2 | **Kontrol Akses & IDOR antar organisasi/peran** | Mengakses URL `/transactions`, `/audit-logs`, `/organization/settings`, dan `/platform/organizations` memakai akun Anggota atau organisasi berbeda | **Lolos** | Diblokir middleware `member:<role>` (`403`) dan global scope `BelongsToOrganization` (`404`) |
+| 3 | **Autentikasi, Password Kuat & Rate Limiting** | Mendaftarkan password lemah (< 10 karakter / tanpa angka) serta mencoba login salah > 5 kali berturut-turut | **Lolos** | Password lemah ditolak validasi; login dibatasi maksimal 5 percobaan gagal/menit via `RateLimiter`; password di-hash bcrypt |
+| 4 | **Manajemen Sesi & Security Headers** | Memeriksa header respons HTTP dan atribut cookie sesi (`HttpOnly`, `SameSite`, `Secure` di produksi) | **Lolos** | Ditambahkan middleware `SecurityHeaders` (`X-Frame-Options`, `X-Content-Type-Options`, `CSP`, `Referrer-Policy`, `HSTS`) dan default `SESSION_SECURE_COOKIE` otomatis aktif saat `production` |
+| 5 | **Pemindaian Secret & Audit Dependency** | Menjalankan pemindaian kata kunci secret pada file ter-track + riwayat Git serta `composer audit` & `npm audit` | **Lolos** | Password dipindahkan ke `.env` (`.gitignore`), akun demo dihapus dari repo, dan command `make:superadmin` dibuat untuk produksi |
+
+> Catatan: Setelah aplikasi di-deploy ke domain publik dengan HTTPS aktif, lengkapi tabel dan lampiran laporan dengan tangkapan layar hasil pengecekan `securityheaders.com` / SSL Labs serta hasil `composer audit` dan `npm audit`.
